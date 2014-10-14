@@ -11,27 +11,27 @@ int *k = new int[m,n];
 for (int i = 0; i <= n-1; i++) {
 	for (int j=0; j<=m-1;j++){
 	        if ((i<n/2) && (j>=i) && (j<=m-i-1))
-                        {
-		k[i,j]=i+1;
-		DocOut<<k[i,j];
+                {
+		  k[i,j]=i+1;
+		  DocOut<<k[i,j];
 	        }
 	        else 
-                        {
-                                if ((i>=n/2) && (j>=abs(n-i)) && (j<=m-abs(n-i))) 
-                                {
+                {
+                  if ((i>=n/2) && (j>=abs(n-i)) && (j<=m-abs(n-i))) 
+                  {
 		    k[i,j]=n-i;DocOut<<k[i,j];
-	                }
-	                else 
-                                {
-                                    if (j<m/2)
-                                    {
-                                         k[i,j]=j+1; DocOut<<k[i,j];
-		    }
-		    else 
-                                    {
-                                         k[i,j]=m-j;DocOut<<k[i,j];
+	          }
+	          else 
+                  {
+                     if (j<m/2)
+                     {
+                        k[i,j]=j+1; DocOut<<k[i,j];
+		     }
+		     else 
+                     {
+                        k[i,j]=m-j;DocOut<<k[i,j];
 		     };
-		};
+		  };
 	        };
 	}
     DocOut<<endl;
