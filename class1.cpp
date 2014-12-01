@@ -14,124 +14,124 @@
 using namespace std;
 void VivodBukvi(vector<vector<string>>& book) // вывод поиска по буквам
 {
-			for (int i=0; i<book.size(); i++)
-			{
-				cout<<book[i][0]<<" ";
-				for (int j=1;j<book[i].size(); j++)
-				{
-					if (j>1)
-					cout<<setw(book[i][0].size()+book[i][j].size()+1)<<book[i][j]<<endl;
-					else cout<< book[i][j]<<endl;
-				}
-			}
+	for (int i=0; i<book.size(); i++)
+	{
+		cout<<book[i][0]<<" ";
+		for (int j=1;j<book[i].size(); j++)
+		{
+			if (j>1)
+			cout<<setw(book[i][0].size()+book[i][j].size()+1)<<book[i][j]<<endl;
+			else cout<< book[i][j]<<endl;
+		}
+	}
 			
 }
 void vivod(vector<vector<string>>& book) // обновление книги
 {
-	ofstream outfile("in.txt",ios::out);
-		for (int i=0; i<book.size(); i++)
-                {
-				outfile<<book[i][0]<<" ";
-				for (int j=1;j<book[i].size(); j++)
-				{
-					if (j>1)
-					outfile<<setw(book[i][0].size()+book[i][j].size()+1)<<book[i][j]<<endl;
-					else outfile<< book[i][j]<<endl;
-				}
-		}
-		outfile.close();
+ofstream outfile("in.txt",ios::out);
+for (int i=0; i<book.size(); i++)
+{
+	outfile<<book[i][0]<<" ";
+	for (int j=1;j<book[i].size(); j++)
+	{
+		if (j>1)
+		outfile<<setw(book[i][0].size()+book[i][j].size()+1)<<book[i][j]<<endl;
+		else outfile<< book[i][j]<<endl;
+	}
+}
+outfile.close();
 }
 void VivodImeni(vector<string>&book) // вывод данных по поиску по имени
 {
-		for (int i=0; i<book.size(); i++)
-			{
-				cout<<book[i]<<endl;
-			}
+	for (int i=0; i<book.size(); i++)
+		{
+			cout<<book[i]<<endl;
+		}
 }
 void massiv (const vector <char>& stroka, string &name, string &tel) // конструктор таблицы
 {
-	int flag =0;
-	for (int i=stroka.size()-1; i>0; i--) // поиск последнего пробела - отделение ФИО и номера
+int flag =0;
+for (int i=stroka.size()-1; i>0; i--) // поиск последнего пробела - отделение ФИО и номера
+{
+	if (stroka[i]==' ')
 	{
-		if (stroka[i]==' ')
-		{
-			flag=i;
-			break;
-		}
+		flag=i;
+		break;
 	}
+}
 
-	for (int i=0;i<=stroka.size()-1 ; i++) 
-	{ 
-		if ((i<=flag) )
-		{
-		if (stroka[i]!=' ')
-		    name.push_back(stroka[i]);
-		}
-		else 
-			if (isdigit(stroka[i])!=0 ||stroka[i]=='+' || stroka[i]=='*' || stroka[i]=='#' || stroka[i]=='p' ) 
-			     tel.push_back(stroka[i]); 
+for (int i=0;i<=stroka.size()-1 ; i++) 
+{ 
+	if ((i<=flag) )
+	{
+	if (stroka[i]!=' ')
+	    name.push_back(stroka[i]);
 	}
+	else 
+		if (isdigit(stroka[i])!=0 ||stroka[i]=='+' || stroka[i]=='*' || stroka[i]=='#' || stroka[i]=='p' ) 
+		     tel.push_back(stroka[i]); 
+        }
 }
 
 int main()
 {
-	SetConsoleCP(1251);
-	SetConsoleOutputCP(1251);
-	fstream F; 
-	F.open("in.txt", ios::in);
-	vector<char> stroka;
-	vector<vector <string>> book; // таблица номеров
-	vector <string> book1;
-	string tel;
-	string name;
-	char simvol;
-	while (!F.eof())// Чтение строки и занесение ее в таблицу
-	{		
-		F.get(simvol);
-		if (simvol!=10)
+SetConsoleCP(1251);
+SetConsoleOutputCP(1251);
+fstream F; 
+F.open("in.txt", ios::in);
+vector<char> stroka;
+vector<vector <string>> book; // таблица номеров
+vector <string> book1;
+string tel;
+string name;
+char simvol;
+while (!F.eof())// Чтение строки и занесение ее в таблицу
+{		
+	F.get(simvol);
+	if (simvol!=10)
+	{
+		stroka.push_back(simvol); 
+	}
+	else 
+	{
+		if (stroka.size()>0)
 		{
-			stroka.push_back(simvol); 
-		}
-		else 
-		{
-			if (stroka.size()>0)
+			massiv(stroka, name, tel);
+			if (name.size()>1)
 			{
-				massiv(stroka, name, tel);
-				if (name.size()>1)
-				{
-					if (book1.size()>0)
-						book.push_back(book1);
-					book1.clear();
-					book1.shrink_to_fit();
-					book1.push_back(name);
-					book1.push_back(tel);
-				}
-				else 
-				{
+				if (book1.size()>0)
+					book.push_back(book1);
+				book1.clear();
+				book1.shrink_to_fit();
+				book1.push_back(name);
 				book1.push_back(tel);
-				}
-				stroka.clear(); 
-				stroka. shrink_to_fit();
-				name.clear();
-				tel.clear();
 			}
+			else 
+			{
+			book1.push_back(tel);
+			}
+			stroka.clear(); 
+			stroka. shrink_to_fit();
+			name.clear();
+			tel.clear();
 		}
 	}
-	if (book1.size()>0)
-		book.push_back(book1);
-	book1.clear();
-	book1.shrink_to_fit();
-	TelBook objTelbook(book);
-	stroka. shrink_to_fit();
-  F.close();
-	cout<<"Вас приветствует ТЕЛЕФОННАЯ КНИГА"<<endl
-	<<"Для продолжения работы выберите 1 из пунктов меню (введите цифру функции)"<<endl;
-	cout<<"1 - удаления контакта"<<endl<<"2 - добавления контата"<<endl<<"3 - поиска абонента по имени"<<
-	endl<<"4 - поиска по номеру"<<endl<<"5 - поиска абонентов по первым буквам имени"<<endl
-	<<"6 - удаление телефона из контакта"<<endl;
-	int zadacha=0;
-	cin>>zadacha;
-	string per;
+}
+if (book1.size()>0)
+	book.push_back(book1);
+book1.clear();
+book1.shrink_to_fit();
+TelBook objTelbook(book);
+stroka. shrink_to_fit();
+F.close();
+cout<<"Вас приветствует ТЕЛЕФОННАЯ КНИГА"<<endl
+<<"Для продолжения работы выберите 1 из пунктов меню (введите цифру функции)"<<endl;
+cout<<"1 - удаления контакта"<<endl<<"2 - добавления контата"<<endl<<"3 - поиска абонента по имени"<<
+endl<<"4 - поиска по номеру"<<endl<<"5 - поиска абонентов по первым буквам имени"<<endl
+<<"6 - удаление телефона из контакта"<<endl;
+int zadacha=0;
+cin>>zadacha;
+string per;
 while(zadacha<7 && zadacha>0) //меню
 {
   	switch (zadacha)
