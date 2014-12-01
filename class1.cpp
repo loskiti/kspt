@@ -28,9 +28,9 @@ void VivodBukvi(vector<vector<string>>& book) // вывод поиска по б
 }
 void vivod(vector<vector<string>>& book) // обновление книги
 {
-		ofstream outfile("C:\\Users\\Всемогущая\\Music\\6\\in.txt",ios::out);
+	ofstream outfile("in.txt",ios::out);
 		for (int i=0; i<book.size(); i++)
-    {
+                {
 				outfile<<book[i][0]<<" ";
 				for (int j=1;j<book[i].size(); j++)
 				{
@@ -65,11 +65,11 @@ void massiv (const vector <char>& stroka, string &name, string &tel) // конс
 		if ((i<=flag) )
 		{
 		if (stroka[i]!=' ')
-		name.push_back(stroka[i]);
+		    name.push_back(stroka[i]);
 		}
 		else 
 			if (isdigit(stroka[i])!=0 ||stroka[i]=='+' || stroka[i]=='*' || stroka[i]=='#' || stroka[i]=='p' ) 
-			tel.push_back(stroka[i]); 
+			     tel.push_back(stroka[i]); 
 	}
 }
 
@@ -78,7 +78,7 @@ int main()
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 	fstream F; 
-	F.open("C:\\Users\\Всемогущая\\Music\\6\\in.txt", ios::in);
+	F.open("in.txt", ios::in);
 	vector<char> stroka;
 	vector<vector <string>> book; // таблица номеров
 	vector <string> book1;
@@ -124,31 +124,34 @@ int main()
 	TelBook objTelbook(book);
 	stroka. shrink_to_fit();
   F.close();
-	cout<<"Вас приветствует ТЕЛЕФОННАЯ КНИГА"<<endl<<"Для продолжения работы выберите 1 из пунктов меню (введите цифру функции)"<<endl;
-	cout<<"1 - удаления контакта"<<endl<<"2 - добавления контата"<<endl<<"3 - поиска абонента по имени"<<endl<<"4 - поиска по номеру"<<endl<<"5 - поиска абонентов по первым буквам имени"<<endl<<"6 - удаление телефона из контакта"<<endl;
+	cout<<"Вас приветствует ТЕЛЕФОННАЯ КНИГА"<<endl
+	<<"Для продолжения работы выберите 1 из пунктов меню (введите цифру функции)"<<endl;
+	cout<<"1 - удаления контакта"<<endl<<"2 - добавления контата"<<endl<<"3 - поиска абонента по имени"<<
+	endl<<"4 - поиска по номеру"<<endl<<"5 - поиска абонентов по первым буквам имени"<<endl
+	<<"6 - удаление телефона из контакта"<<endl;
 	int zadacha=0;
 	cin>>zadacha;
 	string per;
-	while(zadacha<7 && zadacha>0) //меню
-	{
+while(zadacha<7 && zadacha>0) //меню
+{
   	switch (zadacha)
-	  {
+	{
 	   case 1:  //удаление человека с номерами 
-	   {
+	        {
 		 	 cout<<"Вы зашли в функцию удаления контакта. Введите его имя:"<<endl;
 			 cin>>per;
 			 book=objTelbook.delit(per);
 			 vivod(book);
 			 break;
-		 }
+	        }
   	 case 2: // добавление человека с номерами 
-		 {
+		{
 			cout<<"Вы зашли в функцию добавления контата. Введите ФИО:"<<endl;
 			getline(std::cin,per);
 			cout<<"Сколько телефонных номеров вы хотите добавить?"<<endl;
 			cin>>zadacha;
 			if (zadacha<11)
-		  {
+		        {
 				if (zadacha>1) // если номеров несколько
 				{
 					book1.push_back(per);
