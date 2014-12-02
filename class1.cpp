@@ -92,7 +92,6 @@ while(zadacha<7 && zadacha>0) //меню
 		{
 			cout<<"Вы зашли в функцию добавления контата. Введите ФИО:"<<endl;
 			getline(std::cin,per);
-			getline(std::cin,per);
 			cout<<"Сколько телефонных номеров вы хотите добавить?"<<endl;
 			cin>>zadacha;
 			if (zadacha<11)
