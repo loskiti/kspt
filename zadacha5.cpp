@@ -19,29 +19,30 @@
 #include <string>
 #include <vector>
 using namespace std;
-string OutTeg; // сам тег, т.е. "<i>" или "</b>" 
-int WorkWithTeg (int WorkTeg, const char teg, string output) // подготовка "обозначений" тегов к записи
+
+string WorkWithTag (int& WorkTag, const char tag, string output) // подготовка "обозначений" тегов к записи
 {	
-	if (WorkTeg==0) // открытие тега
+	string OutTag;
+	if (WorkTag==0) // открытие тега
 	{
-		WorkTeg=1; 
-		OutTeg=teg;
-		OutTeg.push_back('>');
-		OutTeg.insert(OutTeg.begin(), '<');
+		WorkTag=1; 
+		OutTag=tag;
+		OutTag.push_back('>');
+		OutTag.insert(OutTag.begin(), '<');
 	}
 	else  // закрытие тега
 	{
-		WorkTeg=0;
-		OutTeg=teg;
-		OutTeg.push_back('>');
-		OutTeg="</"+OutTeg;
+		WorkTag=0;
+		OutTag=tag;
+		OutTag.push_back('>');
+		OutTag="</"+OutTag;
 	}
-	return WorkTeg;
+	return OutTag;
 }
 int main(int argc,char *argv[]){
 	char simvol; 
 	string input = "in.md", output = "out.html";
-	int OneStarTeg, TitleTeg_N, TitleTeg_flag, DoubleStarTeg, TitleTeg,i;
+	int OneStarTag, TitleTag_N, TitleTag_flag, DoubleStarTag, TitleTag,i;
 	if (argc>=2) //если входной и выходной файл являются аргументами командной строки
 	{ 
 		input = argv[1];
@@ -55,101 +56,125 @@ int main(int argc,char *argv[]){
 	file.open(input);
 	ofstream outfile(output,ios::out);
 	outfile <<"<html> <body>"<<endl;
-	TitleTeg_N=0;           // определение, надо открыть или закрыть тег "<hN>"
-	OneStarTeg=0;     // определение, надо открыть или закрыть тег "<i>"
-	TitleTeg_flag=0;  // счетчик в теге "<hN>"
-	DoubleStarTeg=0;  // определение, надо открыть или закрыть тег "<b>"
-	TitleTeg=0;      // определение, надо открыть или закрыть тег "<p>"
+	TitleTag_N=0;           // определение, надо открыть или закрыть тег "<hN>"
+	OneStarTag=0;     // определение, надо открыть или закрыть тег "<i>"
+	TitleTag_flag=0;  // счетчик в теге "<hN>"
+	DoubleStarTag=0;  // определение, надо открыть или закрыть тег "<b>"
+	TitleTag=0;      // определение, надо открыть или закрыть тег "<p>"
 	while (!(file.eof()))// Чтение одного байта из файла и запись этого элемента в массив
 	{		
 		file.get(simvol);
-		stroka.push_back(simvol); 
+		stroka.push_back(simvol);	
 	}
+	stroka.pop_back();
 	int size =stroka.size();
-	for (int i = 0; i < size-1; i++)
+	string OutTag; // сам тег, т.е. "<i>" или "</b>" 
+	for ( i = 0; i < size-1; i++)
 	{
-		if (stroka[i]=='*') // работа с тегами <b> и <i>
+		switch(stroka[i])
 		{
-			if (stroka[i+1]!='*')
-			{		
-				OneStarTeg=WorkWithTeg(OneStarTeg,'i', output); // создание тега "<i>" или "</i>" 
-				outfile<<OutTeg;                          // и запись его в файл
-			}
-			else 
-			{				
-				DoubleStarTeg=WorkWithTeg(DoubleStarTeg,'b', output); // создание тега "<b>" или "</b>" 
-				i+=1;                           // "пропускаем" следующий символ, тк он является 
-				//  частью тега
-				outfile<<OutTeg;                //  запись тега в файл
-			}
-		}
-		if (stroka[i]=='/') // "пропуск" одинарного символа "/"
-		{
-			if (stroka[i+1]=='/')
+		case '*': // работа с тегами <b> и <i>
+			{  
+			        if (stroka[i+1]!='*')
+		        	{		
+				OutTag=WorkWithTag(OneStarTag,'i', output); // создание тега "<i>" или "</i>" 
+			        	outfile<<OutTag;                          // и запись его в файл
+			        }
+			        else 
+			        {				
+				        OutTag=WorkWithTag(DoubleStarTag,'b', output); // создание тега "<b>" или "</b>" 
+				        i+=1;                           // "пропускаем" следующий символ, тк он является 
+				                                     //  частью тега
+				         outfile<<OutTag;//  запись тега в файл
+				         continue;
+			        }
+		        	break;
+			 }
+
+				 
+		case '/': // "пропуск" одинарного символа "/"
 			{
-				outfile<<stroka[i];
-				i+=1;
-			}
-			if (stroka[i+1]=='*')
-			{
-				outfile<<stroka[i+1];
-				i+=1;
-			}
-			if (stroka[i+1]=='#')
-			{
-				outfile<<stroka[i+1];
-				i+=2;
-			}
-		}
-		if (stroka[i]=='#')  // работа с тегом заголовка
-		{
-			if ((stroka[i-1]==10) || (i==0)) // определение, является ли символ "#"
-			{                                // началом строки
-				TitleTeg_N=1; // символ - начало строки, до него не стоит "/"
-				TitleTeg_flag=1; // требуется использование тега "<hN>"
-			}
-			if (TitleTeg_N>=1) // подсчет кол-ва подряд стоящих символов "#" 
-			{
-				TitleTeg_N=TitleTeg_N+1;
-			}
-			if (((stroka[i+1]!='#') || (TitleTeg_N==8)) && (TitleTeg_flag==1)) // открытие тега "<hN>"
-			{
-				outfile<<"<h" <<TitleTeg_N-1<<">"; 
-				TitleTeg_flag=TitleTeg_N-2; // кол-во "#", являющихся частью тега "<hN>"
-			}
-			else  // если символов "#" больше 7 или они не начинают строку, 
-				// то они не являются частью тега "<hN>"
-				if ((TitleTeg_N>8) || (TitleTeg_flag==0))
+				if (stroka[i+1]=='/')
 				{
-					outfile<<stroka[i];
-				}			
-		}
-		if (stroka[i]==10) // работа с символом перехода на новую строку
-		{
-			if (TitleTeg_flag>1) // закрытие тега "<hN>"
-			{
-				outfile<<"</h" <<TitleTeg_flag+1<<">";
-				TitleTeg_flag=0;
-				TitleTeg_N=0;
+					outfile<<stroka[i+1];
+					i+=1;
+					continue;
+				}
+				if (stroka[i+1]=='*')
+				{
+					outfile<<stroka[i+1];
+					i+=1;
+					continue;
+				}
+				if (stroka[i+1]=='#')
+				{
+					outfile<<stroka[i+1];
+					i+=1;
+					continue;
+				}
+	               		break;
 			}
+			
+		case '#':// работа с тегом заголовка
+			{
+				if ((stroka[i-1]==10) || (i==0)) // определение, является ли символ "#"
+				{                                // началом строки
+					TitleTag_N=1; // символ - начало строки, до него не стоит "/"
+					TitleTag_flag=1; // требуется использование тега "<hN>"
+				}
+				if (TitleTag_N>=1) // подсчет кол-ва подряд стоящих символов "#" 
+				{
+					TitleTag_N=TitleTag_N+1;
+				}
+				if (((stroka[i+1]!='#') || (TitleTag_N==8)) && (TitleTag_flag==1)) // открытие тега "<hN>"
+				{
+					outfile<<"<h" <<TitleTag_N-1<<">"; 
+					TitleTag_flag=TitleTag_N-2; // кол-во "#", являющихся частью тега "<hN>"
+				}
+				else  // если символов "#" больше 7 или они не начинают строку, 
+					// то они не являются частью тега "<hN>"
+					if ((TitleTag_N>8) || (TitleTag_flag==0))
+					{
+						outfile<<stroka[i];
+					}
+				break;
+			}
+			
+		case 10: // работа с символом перехода на новую строку
+			{
+				if (TitleTag_flag>1) // закрытие тега "<hN>"
+				{
+					outfile<<"</h" <<TitleTag_flag+1<<">";
+					TitleTag_flag=0;
+					TitleTag_N=0;
+				}
 
-			if((stroka[i+1]==10) && (i<size-2) ) // при условии, что следующая строка - пустая 
-			{
-				TitleTeg=WorkWithTeg(TitleTeg,'p', output); // создание тега "<р>" или "</р>" 
-				outfile<<OutTeg;                           // и запись его в файл
+				if((stroka[i+1]==10) && (i<size-2) ) // при условии, что следующая строка - пустая 
+				{
+					OutTag=WorkWithTag(TitleTag,'p', output); // создание тега "<р>" или "</р>" 
+					outfile<<OutTag;                           // и запись его в файл
+				}
+				else outfile<<stroka[i]; // просто переход на новую строку
+	                 	break;	
 			}
-			else outfile<<stroka[i]; // просто переход на новую строку
-		}
-		if ((stroka[i]!=10) && (stroka[i]!='#') && (stroka[i]!='/') && (stroka[i]!='*')) 
-			// вывод обычных символов, не являющихся началами тегов
+			
+		
+			
+		default:// вывод обычных символов, не являющихся началами тегов
+			{
 			outfile<<stroka[i];
-
+			break;
+			}
+			
+		}
 	}
-	stroka.clear(); //"очищение" массива
-	stroka. shrink_to_fit();
-	outfile<<"</body> </html>"<<endl;
-	file.close(); // закрытие файлов
-	outfile.close();
-	system("pause");
-	return 0;
-}
+		if (i<stroka.size()) // вывод последнего символа при условии, что он не является частью тега
+			outfile<<stroka[i];
+		stroka.clear(); //"очищение" массива
+		stroka. shrink_to_fit();
+		outfile<<"</body> </html>"<<endl;
+		file.close(); // закрытие файлов
+		outfile.close();
+		system("pause");
+		return 0;
+	}
