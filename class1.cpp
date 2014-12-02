@@ -11,7 +11,6 @@
 //получение списка телефонов заданного человека, получение человека, соответствующего заданному телефону, 
 //получение списка людей, фамилия которых начинается на заданную подстроку.
 // Написать главную функцию, тестирующую данный класс путём создания его объектов и проведения над ними различных операций.
-// class.cpp: определяет точку входа для консольного приложения.
 
 // class.cpp: определяет точку входа для консольного приложения.
 #include <Windows.h>
@@ -27,8 +26,13 @@
 #include <fstream>
 #include <cstring>
 using namespace std;
+void vivodRes(bool resultat)
+{
+	if (resultat == true) cout<<"Выполнено"<<endl;
+			else cout<<"Таких данных не существует"<<endl;
+}
 void VivodBukvi(vector<vector<string>>& book) // вывод поиска по буквам
-		{
+{
 			
 			for (int i=0; i<book.size(); i++)
 
@@ -46,123 +50,32 @@ void VivodBukvi(vector<vector<string>>& book) // вывод поиска по б
 			}
 			
 }
-void vivod(vector<vector<string>>& book) // обновление книги
-		{
-			ofstream outfile("in.txt",ios::out);
-			for (int i=0; i<book.size(); i++)
-
-			{
-				outfile<<book[i][0]<<" ";
-				for (int j=1;j<book[i].size(); j++)
-				{
-					
-					if (j>1)
-					outfile<<setw(book[i][0].size()+book[i][j].size()+1)<<book[i][j]<<endl;
-					else outfile<< book[i][j]<<endl;
-
-
-				}
-			}
-			outfile.close();
-}
 void VivodImeni(vector<string>&book) // вывод данных по поиску по имени
 {
-		for (int i=0; i<book.size(); i++)
+	for (int i=0; i<book.size(); i++)
 
-			{
-				cout<<book[i]<<endl;
-							}
-			
-
-}
-void massiv (const vector <char>& stroka, string &name, string &tel) // конструктор таблицы
-{
-	int flag =0;
-	for (int i=stroka.size()-1; i>0; i--) // поиск последнего пробела - отделение ФИО и номера
-	{
-		if (stroka[i]==' ')
 		{
-			flag=i;
-			break;
+			cout<<book[i]<<endl;
 		}
-	}
-
-	for (int i=0;i<=stroka.size()-1 ; i++) 
-	{ 
-		if ((i<flag) )
-		{
-			if (stroka[i]!=' ')
-				name.push_back(stroka[i]);
-			else 
-				if  (i>0)
-					if (stroka[i-1]!=' ')
-						name.push_back(stroka[i]);
-		}
-
-		else 
-			if (isdigit(stroka[i])!=0 ||stroka[i]=='+' || stroka[i]=='*' || stroka[i]=='#' || stroka[i]=='p' || stroka[i]!=' ') 
-				tel.push_back(stroka[i]); 
-	}
+		
 }
 
 int main()
 {
-	SetConsoleCP(1251);
-	SetConsoleOutputCP(1251);
-	fstream F; 
-	F.open("in.txt", ios::in);
-	vector<char> stroka;
-	vector<vector <string>> book; // таблица номеров
-	vector <string> book1;
-	string tel;
-	string name;
-	char simvol;
-	while (!F.eof())// Чтение строки и занесение ее в таблицу
-	{		
-		F.get(simvol);
-
-		if (simvol!=10)
-		{
-			stroka.push_back(simvol); 
-		}
-		else 
-		{
-			if (stroka.size()>0)
-			{
-				massiv(stroka, name, tel);
-				if (name.size()>1)
-				{
-					if (book1.size()>0)
-						book.push_back(book1);
-					book1.clear();
-					book1.shrink_to_fit();
-					book1.push_back(name);
-					book1.push_back(tel);
-
-				}
-				else 
-				{book1.push_back(tel);
-				}
-				stroka.clear(); 
-				stroka. shrink_to_fit();
-				name.clear();
-				tel.clear();
-			}
-		}
-	}
-	if (book1.size()>0)
-		book.push_back(book1);
-	book1.clear();
-	book1.shrink_to_fit();
-	TelBook objTelbook(book);
-	stroka. shrink_to_fit();
-F.close();
-	cout<<"Вас приветствует ТЕЛЕФОННАЯ КНИГА"<<endl<<"Для продолжения работы выберите 1 из пунктов меню (введите цифру функции)"<<endl;
-	cout<<"1 - удаления контакта"<<endl<<"2 - добавления контата"<<endl<<"3 - поиска абонента по имени"<<endl<<"4 - поиска по номеру"<<endl<<"5 - поиска абонентов по первым буквам имени"<<endl<<"6 - удаление телефона из контакта"<<endl;
-	int zadacha=0;
-	cin>>zadacha;
-	string per;
-	while(zadacha<7 && zadacha>0) //меню
+SetConsoleCP(1251);
+SetConsoleOutputCP(1251);
+vector<vector <string>> book; // таблица номеров
+vector <string> book1;
+string tel;
+TelBook objTelbook(book); 
+objTelbook.vvod();// чтение из файла
+cout<<"Вас приветствует ТЕЛЕФОННАЯ КНИГА"<<endl<<"Для продолжения работы выберите 1 из пунктов меню (введите цифру функции)"<<endl;
+cout<<"1 - удаления контакта"<<endl<<"2 - добавления контата"<<endl<<"3 - поиска абонента по имени"<<endl<<"4 - поиска по номеру"<<endl<<"5 - поиска абонентов по первым буквам имени"<<endl<<"6 - удаление телефона из контакта"<<endl;
+int zadacha=0;
+cin>>zadacha;
+string per;
+bool resultat;
+while(zadacha<7 && zadacha>0) //меню
 	{
 	switch (zadacha)
 	{
@@ -170,14 +83,15 @@ F.close();
 		{
 			cout<<"Вы зашли в функцию удаления контакта. Введите его имя:"<<endl;
 			getline(std::cin,per);
-			getline(std::cin,per);
-			book=objTelbook.delit(per);
-			vivod(book);
+			resultat=objTelbook.delit(per);
+			vivodRes(resultat);
+			objTelbook.vivod();
 			break;
 		}
 	case 2: // добавление человека с номерами 
 		{
 			cout<<"Вы зашли в функцию добавления контата. Введите ФИО:"<<endl;
+			getline(std::cin,per);
 			getline(std::cin,per);
 			cout<<"Сколько телефонных номеров вы хотите добавить?"<<endl;
 			cin>>zadacha;
@@ -192,9 +106,10 @@ F.close();
 						cin>>tel;
 						book1.push_back(tel);	 
 						tel.clear();
-						}
-					book=objTelbook.dobavlenie(book1);
-					vivod(book);
+					}
+					resultat=objTelbook.dobavlenie(book1);
+					vivodRes(resultat);
+					objTelbook.vivod();
 					per.clear();
 					book1.clear();
 					book1.shrink_to_fit();
@@ -204,8 +119,9 @@ F.close();
 				{
 					cout<< "Введите номер:"<<endl; 
 					cin>>tel;
-					book=objTelbook.OdinNomDobavlenie(per,tel);
-					vivod(book);
+					resultat=objTelbook.OdinNomDobavlenie(per,tel);
+					objTelbook.vivod();
+					vivodRes(resultat);
 					break;
 				}
 			}
@@ -250,15 +166,16 @@ F.close();
 			getline(std::cin,per);
 			cout<<"Введите номер телефона, который хотите удалить:"<<endl;
 			cin>>tel;
-			book=objTelbook.delittel(per, tel);
-			vivod(book);
+			resultat=objTelbook.delittel(per, tel);
+			vivodRes(resultat);
+			objTelbook.vivod();
 			break;
 		}
-	}
-	cout<<"Хотите выполнить еще какие-нибудь операции? Если да - выберите номер этой операции"<<endl;
-	cin>>zadacha;
-	}
-	cout<<"Телефонная книга все сделала."<<endl;
-	system("pause");
-	return 0;
+        }
+        cout<<"Хотите выполнить еще какие-нибудь операции? Если да - выберите номер этой операции"<<endl;
+        cin>>zadacha;
+}
+cout<<"Телефонная книга все сделала."<<endl;
+system("pause");
+return 0;
 }
