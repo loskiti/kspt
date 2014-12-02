@@ -12,14 +12,16 @@ private:
 public:
 	TelBook(const vector<vector <string>>&);
 	//void setBook (const vector <vector<string>>&);
-	vector<vector<string>> delit(string ); // удаление абонента со всеми номерами
-	void message();
+	bool delit(string ); // удаление абонента со всеми номерами
 	vector<string> poiskpoimeni(string);// поиск абонента по имени
 	string poiskpotel(string);// поиск абонента по телефону
 	vector<vector <string>> poiskpobokve(string );// начинающиеся с определенных букв 
 	~TelBook();
-	vector<vector <string>> dobavlenie( vector <string>&);// добавление абонента с несколькими номерами
-	vector<vector <string>> delittel(string, string);// удаление 1 телефона из контакта,
-	                                                 //у которого телефонов много
-	vector<vector <string>> OdinNomDobavlenie(string, string); // добавление пары абонент-телефон
+	bool dobavlenie( vector <string>&);// добавление абонента с несколькими номерами
+	bool delittel(string, string);// удаление 1 телефона из контакта,
+	                             //у которого телефонов много
+	bool OdinNomDobavlenie(string, string); // добавление пары абонент-телефон
+	void vivod ();
+	void vvod();
+	void massiv(const vector <char>&, string&, string&);
 };
