@@ -63,27 +63,16 @@ string TelBook::poiskpotel(string poisktel) // поиск абонента по 
 
 	return ("Такого абонента не существует");
 }
-vector<vector <string>> TelBook::poiskpobokve(string poiskbokva) // начинающиеся с определенных букв 
+vector <string> TelBook::poiskpobokve(string poiskbokva) // начинающиеся с определенных букв 
 { 
-int flag=0;
-vector<vector <string>> VecVivod;
-vector<string> book1;
-for (int i=0; i<book.size();i++)
-{
-	size_t pos=book[i][0].find(poiskbokva);
-	if(pos==0){
-		flag=1;
-		for (int j=0; j<book[i].size();j++)
-		{
-			book1.push_back(book[i][j]);
-		}
-		VecVivod.push_back(book1);
-		book1.clear();
-		book1.shrink_to_fit();
+	vector<string> VecVivod;
+	for (int i=0; i<book.size();i++)
+	{
+		size_t pos=book[i][0].find(poiskbokva);
+		if(pos==0)
+			VecVivod.push_back(book[i][0]);
 	}
-
-}
-return (VecVivod);
+	return (VecVivod);
 }
 TelBook::~TelBook()
 {
@@ -92,10 +81,10 @@ bool TelBook::dobavlenie( vector <string>& book2) // добавление або
 {
 	book.push_back(book2);
 	return true;
-	
+
 }
 bool TelBook::delittel(string name, string tel)// удаление 1 телефона из контакта,
-	                                                              //у которого телефонов много
+	                                           //у которого телефонов много
 {
 	for  (int i=0; i<book.size();i++)
 	{
@@ -114,7 +103,7 @@ bool TelBook::delittel(string name, string tel)// удаление 1 телеф�
 
 		}
 	}
-	
+
 	return false;
 }
 bool TelBook::OdinNomDobavlenie (string name, string tel) // добавление пары абонент-телефон
@@ -127,66 +116,71 @@ bool TelBook::OdinNomDobavlenie (string name, string tel) // добавлени�
 }
 void TelBook::vivod() // обновление книги
 {
-ofstream outfile("in.txt",ios::out);
-for (int i=0; i<book.size(); i++)
-{
-	outfile<<book[i][0]<<" ";
-	for (int j=1;j<book[i].size(); j++)
+	ofstream outfile("in.txt",ios::out);
+	for (int i=0; i<book.size(); i++)
+
+	{
+		outfile<<book[i][0]<<" ";
+		for (int j=1;j<book[i].size(); j++)
 		{
+
 			if (j>1)
-		         	outfile<<setw(book[i][0].size()+book[i][j].size()+1)<<book[i][j]<<endl;
+				outfile<<setw(book[i][0].size()+book[i][j].size()+1)<<book[i][j]<<endl;
 			else outfile<< book[i][j]<<endl;
+
+
 		}
+	}
+	outfile.close();
 }
-outfile.close();
-}
-void TelBook::vvod() // заполнение книги
+void TelBook::vvod()
 {
-fstream F; 
-F.open("in.txt", ios::in);
-char simvol;
-vector <string> book1;
-vector<char> stroka;
-string tel;
-string name;
-while (!F.eof())// Чтение строки и занесение ее в таблицу
-{		
-	F.get(simvol);
-	if (simvol!=10)
-	{
-		stroka.push_back(simvol); 
-	}
-	else 
-	{
-		if (stroka.size()>0)
+	fstream F; 
+	F.open("in.txt", ios::in);
+	char simvol;
+	vector <string> book1;
+	vector<char> stroka;
+	string tel;
+	string name;
+	while (!F.eof())// Чтение строки и занесение ее в таблицу
+	{		
+		F.get(simvol);
+
+		if (simvol!=10)
 		{
-			massiv(stroka, name, tel);
-			if (name.size()>1)
+			stroka.push_back(simvol); 
+		}
+		else 
+		{
+			if (stroka.size()>0)
 			{
-				if (book1.size()>0)
-					book.push_back(book1);
-				book1.clear();
-				book1.shrink_to_fit();
-				book1.push_back(name);
-				book1.push_back(tel);
+				massiv(stroka, name, tel);
+				if (name.size()>1)
+				{
+					if (book1.size()>0)
+						book.push_back(book1);
+					book1.clear();
+					book1.shrink_to_fit();
+					book1.push_back(name);
+					book1.push_back(tel);
+
+				}
+				else 
+				{book1.push_back(tel);
+				}
+				stroka.clear(); 
+				stroka. shrink_to_fit();
+				name.clear();
+				tel.clear();
 			}
-			else 
-			{
-				book1.push_back(tel);
-			}
-			stroka.clear(); 
-			stroka. shrink_to_fit();
-			name.clear();
-			tel.clear();
 		}
 	}
-}
-if (book1.size()>0)
-	book.push_back(book1);
-book1.clear();
-book1.shrink_to_fit();
-stroka. shrink_to_fit();
-F.close();
+	if (book1.size()>0)
+		book.push_back(book1);
+	book1.clear();
+	book1.shrink_to_fit();
+	stroka. shrink_to_fit();
+	F.close();
 }
 
 void TelBook::massiv (const vector <char>& stroka, string &name, string &tel) // конструктор таблицы
