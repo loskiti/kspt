@@ -4,8 +4,8 @@
 #include <string>
 using namespace std;
 
-void vniz(int &x1, int &y1, int i, vector<vector<int>> &map,string &otvet)
-{
+void vniz(int &x1, int &y1, int i, vector<vector<int>> &map,string &otvet) 
+{ 
 	if (map[y1][x1-1]==i-1) 
 	{	
 		map[y1][x1]=-3;
@@ -67,7 +67,7 @@ void vverx (int &x1, int &y1, int i, vector<vector<int>> map, string &otvet)
 		return;
 	}
 }
-bool rec (int &x1,int &y1,int i,int &k, vector<vector<int>> &map,string &stroka, vector <int> &stop )
+bool rec (int &x1,int &y1,int i,int &k,int &summa, vector<vector<int>> &map,string &stroka, vector <int> &stop )
 {
 	bool flag;
 	if (k==i)
@@ -76,6 +76,7 @@ bool rec (int &x1,int &y1,int i,int &k, vector<vector<int>> &map,string &stroka,
 		{
 			if ((map[stop[j-1]][stop[j-2]]==k)&&((stop[j-1]==y1) &&(x1==stop[j-2])))
 			{
+				summa=summa +stop[j];
 				stop.erase(stop.begin() + j-2, stop.end() -(stop.size()-j-1));
 				if (stop.size()	>0)
 					k=map[stop[stop.size()-2]][stop[stop.size()-3]];
@@ -101,7 +102,7 @@ bool rec (int &x1,int &y1,int i,int &k, vector<vector<int>> &map,string &stroka,
 	if (k>i) // счетчик!!!
 	{
 		vverx(x1,y1,i,map, stroka);
-		flag=rec(x1, y1, i+1, k, map, stroka, stop);
+		flag=rec(x1, y1, i+1, k, summa, map, stroka, stop);
 	}
 	if (flag==true)
 	{
@@ -113,7 +114,7 @@ bool rec (int &x1,int &y1,int i,int &k, vector<vector<int>> &map,string &stroka,
 		if ((map[y1][x1-1]==i+1)||(map[y1][x1+1]==i+1) ||(map[y1+1][x1]==i+1)||(map[y1-1][x1]==i+1))
 		{
 			vverx(x1,y1,i,map, stroka);
-			flag=rec(x1, y1,  i+1, k, map, stroka, stop);
+			flag=rec(x1, y1,  i+1, k,summa, map, stroka, stop);
 			if (flag==true) 
 			{
 				vniz(x1, y1, i, map,stroka);
@@ -246,14 +247,13 @@ int main(int argc,char *argv[])
 	}
 	i=0;
 
-	int temp; 
+	int temp; // перестановка элементов массива
 	for (i = 2; i < stop.size(); i+=3)
 	{
-		temp = stop[i]; // инициализируем временную переменную текущим значением элемента массива
-		// запоминаем индекс предыдущего элемента массива
-		while(i-3 >= 0 && stop[i-3] > stop[i]) // пока индекс не равен 0 и предыдущий элемент массива больше текущего
+		temp = stop[i]; 
+		while(i-3 >= 0 && stop[i-3] > stop[i]) 
 		{
-			stop[i] = stop[i-3]; // перестановка элементов массива
+			stop[i] = stop[i-3]; 
 			stop[i-3] = temp;
 			temp=stop[i-1];
 			stop[i-1]=stop[i-4];
@@ -267,6 +267,8 @@ int main(int argc,char *argv[])
 
 	string otvet;
 	bool flag;
+	temp=0;
+	int summa=0;
 	int k=map[stop[stop.size()-2]][stop[stop.size()-3]];
 	for (i=map[y1][x1]; i>-1;i--)
 	{
@@ -281,9 +283,12 @@ int main(int argc,char *argv[])
 					vniz(x1,y1,i,map, otvet);
 					i--;
 				}
-				if (2*0.1*(k-i)< stop[stop.size()-1])				
-					flag=rec(x1,  y1, i, k, map, otvet, stop);
-
+					temp=otvet.length();			
+					flag=rec(x1,  y1, i, k,summa, map, otvet, stop);
+					if ((otvet.length()-temp)*0.1>=summa)
+								otvet.erase((otvet.length()-temp), temp);	
+					
+					summa=0;
 				if (flag == true)
 				{
 					if ((k==0) && (i==0))
@@ -301,6 +306,12 @@ int main(int argc,char *argv[])
 
 	}
 	cout<<otvet<<endl;
+	stroka.clear(); 
+	//stroka. shrink_to_fit();
+	map.clear(); 
+	//map. shrink_to_fit();
+	stop.clear(); 
+	//stop. shrink_to_fit();
 	file.close();
 	system ("pause");
 	return 0;
