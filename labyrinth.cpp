@@ -18,28 +18,28 @@ void StepDown(int &Out_X, int &Out_Y, int i, vector<vector<int>> &map,string &ot
 	{	
 		map[Out_Y][Out_X]=-3;
 		Out_X=Out_X-1;
-		otvet.push_back('l');
+		otvet.push_back('r');
 		return;
 	}					
 	if (map[Out_Y][Out_X+1]==i-1) 
 	{	
 		map[Out_Y][Out_X]=-3;
 		Out_X=Out_X+1;
-		otvet.push_back('r');
+		otvet.push_back('l');
 		return;
 	}
 	if (map[Out_Y-1][Out_X]==i-1) 
 	{	
 		map[Out_Y][Out_X]=-3;
 		Out_Y=Out_Y-1;
-		otvet.push_back('u');
+		otvet.push_back('d');
 		return;
 	}	
 	if (map[Out_Y+1][Out_X]==i-1) 
 	{	
 		map[Out_Y][Out_X]=-3;
 		Out_Y=Out_Y+1;
-		otvet.push_back('d');
+		otvet.push_back('u');
 		return;
 	}
 
@@ -51,34 +51,36 @@ void StepUp (int &Out_X, int &Out_Y, int i, vector<vector<int>> map, string &otv
 	{	
 		Out_X=Out_X-1;
 		i++;
-		otvet.push_back('l');
+		otvet.push_back('r');
 		return;
 	}					
 	if (map[Out_Y][Out_X+1]==i+1) 
 	{
 		Out_X=Out_X+1;
 		i++;
-		otvet.push_back('r');
+		otvet.push_back('l');
 		return;
 	}
 	if (map[Out_Y-1][Out_X]==i+1) 
 	{	
 		Out_Y=Out_Y-1;
 		i++;
-		otvet.push_back('u');
+		otvet.push_back('d');
 		return;
 	}	
 	if (map[Out_Y+1][Out_X]==i+1) 
 	{	
 		Out_Y=Out_Y+1;
 		i++;
-		otvet.push_back('d');
+		otvet.push_back('u');
 		return;
 	}
 }
 // поиск ячейки с цифрой
-bool Search (int &Out_X,int &Out_Y,int i,int &k,int &summa, vector<vector<int>> &map,string &stroka, vector <int> &stop )
+bool Search (int &Out_X,int &Out_Y,int i,int &k,int &summa,int &flag2, vector<vector<int>> &map,string &stroka, vector <int> &stop )
 {
+
+	flag2=0;
 	bool flag;
 	if (k==i)
 	{
@@ -91,7 +93,7 @@ bool Search (int &Out_X,int &Out_Y,int i,int &k,int &summa, vector<vector<int>> 
 				if (stop.size()	>0)
 					k=map[stop[stop.size()-2]][stop[stop.size()-3]];
 				else 
-					k=0;
+					k=-1;
 
 				if (i>k) // если ячеек с цифрой на данном отрезке несколько - вернем false и поищем их
 				{
@@ -105,14 +107,17 @@ bool Search (int &Out_X,int &Out_Y,int i,int &k,int &summa, vector<vector<int>> 
 				}
 			}
 		}
-		map[Out_Y][Out_X]=-3;
+		map[Out_Y][Out_X]=-3; // ячейка нам не подходит
+		flag2=1;
+		StepDown(Out_X, Out_Y, i, map,stroka);
+
 		return false;
 	}
 
 	if (k>i) // идем до нужной ячейки
 	{
 		StepUp(Out_X,Out_Y,i,map, stroka);
-		flag=Search(Out_X, Out_Y, i+1, k, summa, map, stroka, stop);
+		flag=Search(Out_X, Out_Y, i+1, k, summa,flag2, map, stroka, stop);
 	}
 	if (flag==true) // ячейку нашли, возвращаемся к исходному пути
 	{
@@ -124,19 +129,24 @@ bool Search (int &Out_X,int &Out_Y,int i,int &k,int &summa, vector<vector<int>> 
 		if ((map[Out_Y][Out_X-1]==i+1)||(map[Out_Y][Out_X+1]==i+1) ||(map[Out_Y+1][Out_X]==i+1)||(map[Out_Y-1][Out_X]==i+1))
 		{
 			StepUp(Out_X,Out_Y,i,map, stroka);
-			flag=Search(Out_X, Out_Y,  i+1, k,summa, map, stroka, stop);
+			flag=Search(Out_X, Out_Y,  i+1, k,summa,flag2, map, stroka, stop);
 			if (flag==true) 
 			{
 				StepDown(Out_X, Out_Y, i, map,stroka);
 				return true;
 			}
+			
 		}
 		else
-		{
-			StepDown(Out_X, Out_Y, i, map,stroka);			
+		{ 
+			if(flag2!=1)
+			{
+				StepDown(Out_X, Out_Y, i, map,stroka);
+			}
 			return false;			
 		}
 	}
+	flag2=1;
 	return false;
 }
 
@@ -257,13 +267,14 @@ int main(int argc,char *argv[])
 		i++;
 	}
 	i=0;
+	// каждой точке после распространения волны присвивается цифра (кол-во ходов до точки)
 	// сортировка массива по возрастанию  кол-ва шагов до ячейки
 	int flag2; 
-for (i = 2; i < stop.size(); i+=3)
+	for (i = 2; i < stop.size(); i+=3)
 	{
 		flag2 = stop[i]; 
-		
-			while((i-5)>=0 && map[stop[i-4]][stop[i-5]]>map[stop[i-1]][stop[i-2]])
+
+		while((i-5)>=0 && map[stop[i-4]][stop[i-5]]>map[stop[i-1]][stop[i-2]])
 		{
 			stop[i] = stop[i-3]; 
 			stop[i-3] = flag2;
@@ -282,28 +293,45 @@ for (i = 2; i < stop.size(); i+=3)
 	bool flag;
 	flag2=0;
 	int summa=0;
-	int k=map[stop[stop.size()-2]][stop[stop.size()-3]];
+	int k;
+	if(stop.size()>0)  // проверка, есть ли вообще ячейки с цифрами и нужно ли их искать
+		k=map[stop[stop.size()-2]][stop[stop.size()-3]];
+	else  k=-1;
+	int x,y, flag4;
 	// поиск кротчайшего пути
 	for (i=map[Out_Y][Out_X]; i>-1;i--)
 	{
+		x=Out_X;
+		y=Out_Y;
+		int i1=i;
 		if (k<i)
 			StepDown(Out_X,Out_Y,i,map, otvet);
-		if (k==i) // цена ячейки равна цене ячейки с цифрой, проверка: она ли это, если нет - поиск
+		if ((k==i)||(k>i)) // цена ячейки равна цене ячейки с цифрой, проверка: она ли это, если нет - поиск
 		{ // точки с этой цифрой
 			if ((stop[stop.size()-3]!=Out_X) ||(Out_Y!=stop[stop.size()-2]))
 			{ // спускаемся вниз, пока не достигнем точки, с которой можно попасть в ячейку с цифрой
-				while ((map[Out_Y][Out_X-1]!=i+1)&&(map[Out_Y][Out_X+1]!=i+1) &&(map[Out_Y+1][Out_X]!=i+1)&&(map[Out_Y-1][Out_X]!=i+1))
+				while ((map[Out_Y][Out_X-1]!=i+1)&&(map[Out_Y][Out_X+1]!=i+1)
+				&&(map[Out_Y+1][Out_X]!=i+1)&&(map[Out_Y-1][Out_X]!=i+1))
 				{
 					StepDown(Out_X,Out_Y,i,map, otvet);
 					i--;
+					x=Out_X;
+					y=Out_Y;
 				}
-					flag2=otvet.length();			
-					flag=Search(Out_X,  Out_Y, i, k,summa, map, otvet, stop);
-					// если "вес" точки не перекрывает затраченные на нее шаги - мы в эту точку не идем
-					if ((otvet.length()-flag2)*0.1>=summa)
-								otvet.erase((otvet.length()-flag2), flag2);	
-					
-					summa=0;
+				string flag3=otvet;
+				flag=Search(Out_X,  Out_Y, i, k,summa,flag4, map, otvet, stop);
+				// если "вес" точки не перекрывает затраченные на нее шаги - мы в эту точку не идем
+				if ((otvet.length()-flag3.length())*0.1>=summa)
+					otvet=flag3;
+				if (flag4==1)
+				{ // если не были найдены необходимые нам ячейки с цифрами
+					otvet=flag3;
+					Out_X=x;
+					Out_Y=y;
+					i=map[Out_Y][Out_X]+1;
+
+				}
+				summa=0;
 				if (flag == true) // если точка найдена, продолжим путь
 				{
 					if ((k==0) && (i==0)) // нашли все ячейки - идем к выходу
@@ -320,7 +348,10 @@ for (i = 2; i < stop.size(); i+=3)
 		}
 
 	}
-	cout<<otvet<<endl;
+	for (i=otvet.length()-1;i>-1; i--)
+	{
+		cout<<otvet[i];
+	}
 	stroka.clear(); 
 	stroka. shrink_to_fit();
 	map.clear(); 
@@ -328,7 +359,6 @@ for (i = 2; i < stop.size(); i+=3)
 	stop.clear(); 
 	stop. shrink_to_fit();
 	file.close();
-	system ("pause");
+	//system ("pause");
 	return 0;
 }
-
