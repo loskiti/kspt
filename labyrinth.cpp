@@ -86,7 +86,7 @@ bool Search (int &Out_X,int &Out_Y,int i,int &k,int &summa,int &flag2, vector<ve
 	{
 		for(int j=stop.size()-1; j>-1;j-=3) // нашли ячейку, проверяем: она ли это
 		{
-			if ((map[stop[j-1]][stop[j-2]]==k)&&((stop[j-1]==Out_Y) &&(Out_X==stop[j-2])))
+			if ((stop[j-1]==Out_Y) &&(Out_X==stop[j-2]))
 			{
 				summa=summa +stop[j];
 				stop.erase(stop.begin() + j-2, stop.end() -(stop.size()-j-1));
