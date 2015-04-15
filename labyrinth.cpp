@@ -194,7 +194,7 @@ int main(int argc,char *argv[])
 {
 	setlocale(LC_ALL, ""); 
 	ifstream file;
-	file.open("C:\\Users\\Всемогущая Оо\\Downloads\\Tests\\labirint15.txt");
+	file.open(argv[1]);
 	char simvol; 
 	vector <vector <int>> map; // поле
 	int i=0;
