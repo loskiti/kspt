@@ -3,8 +3,8 @@
 #include <QDialog>
 #include <QTcpSocket>
 #include <QHostAddress>
-#include "C:\QT\server/client.h"
-class Client;
+#include "C:\QT\2\server\myclient.h"   
+class  MyClient;
 
 namespace Ui {
     class Dialog;
@@ -24,24 +24,23 @@ private slots:
     //отключение
     void SokDisconnected();
     //получение информации и ее обработка
-    void SokReadyRead();
+    void SokOperation();
     //смс об ошибках
-    void SokDisplayError(QAbstractSocket::SocketError socketError);
+    void SokError(QAbstractSocket::SocketError socketError);
 //сигнал на соединение
     void on_pbConnect_clicked();
-//сигнал на отлючение
+    //сигнал на отлючение
     void on_pbDisconnect_clicked();
-//сигнал на отправку смс
+    //сигнал на отправку смс
     void on_pbSend_clicked();
 
 private:
     Ui::Dialog *ui;
     QTcpSocket *sok;
-    //длина блока передаваемых данных
     quint16 blockSize;
+    //имя пользователя
     QString name;
-    //вывод на экран
-    void Read(QString text);
+    // функция вывода текста
+    void Write(QString text);
 
 };
-
