@@ -197,13 +197,6 @@ void Dialog::on_pbDisconnect_clicked()
     sok->disconnectFromHost();
 }
 
-//void Dialog::on_cbToAll_clicked()
-//{
-//    if (ui->cbToAll->isChecked())
-//        ui->pbSend->setText("For all");
-//    else
-//        ui->pbSend->setText("Send To Selected");
-//}
 // отправка смс
 void Dialog::on_pbSend_clicked()
 {
