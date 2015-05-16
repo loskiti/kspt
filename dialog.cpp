@@ -168,7 +168,7 @@ void Dialog::SokConnected()
     blockSize = 0;
     Read("Connected to server"+sok->peerAddress().toString());
 
-    //try autch
+ 
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out << (quint16)0;
