@@ -11,10 +11,10 @@ Dialog::Dialog(QWidget *parent) :QDialog(parent),ui(new Ui::Dialog)
 // новый сокет
     sok = new QTcpSocket(this);
     //подключаем сигналы
-    connect(sok, SIGNAL(readyRead()), this, SLOT(onSokReadyRead()));
-    connect(sok, SIGNAL(connected()), this, SLOT(onSokConnected()));
-    connect(sok, SIGNAL(disconnected()), this, SLOT(onSokDisconnected()));
-    connect(sok, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(onSokDisplayError(QAbstractSocket::SocketError)));
+    connect(sok, SIGNAL(readyRead()), this, SLOT(SokRead()));
+    connect(sok, SIGNAL(connected()), this, SLOT(SokConnected()));
+    connect(sok, SIGNAL(disconnected()), this, SLOT(SokDisconnected()));
+    connect(sok, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(SokDisplayError(QAbstractSocket::SocketError)));
 }
 
 Dialog::~Dialog()
@@ -22,7 +22,7 @@ Dialog::~Dialog()
     delete ui;
 }
 //ошибки
-void Dialog::onSokDisplayError(QAbstractSocket::SocketError socketError)
+void Dialog::SokDisplayError(QAbstractSocket::SocketError socketError)
 {
     switch (socketError) {
     //удалённый узел закрывает соединение
@@ -41,7 +41,7 @@ void Dialog::onSokDisplayError(QAbstractSocket::SocketError socketError)
     }
 }
 //получение данных
-void Dialog::onSokReadyRead()
+void Dialog::SokReadyRead()
 {// в каждом блоке первые 2 байта - размер, 3 байт - команда, дальше информация
     QDataStream data(sok);
 
@@ -63,78 +63,73 @@ void Dialog::onSokReadyRead()
 
     switch (command)
     {
-//        case MyClient::comAutchSuccess:
-//        {
-//            ui->pbSend->setEnabled(true);
-//            AddToLog("Enter as "+name);
-//        }
-//        break;
+       
         // когда пользователь входит в чат
-        case MyClient::comUsersOnline:
+        case Client::UsersOnline:
         {
-            AddToLog(name+" is online");
+            Read(name+" is online");
             ui->pbSend->setEnabled(true);
             QString users;
             data >> users;
             if (users == "")
                 return;
-            QStringList flag =  users.split(",");
+            QStringList flag =  users.split(";");
             ui->lwUsers->addItems(flag);
             break;
         }
 
         //смс от сервера для всех
-        case MyClient::comPublicServerMessage:
+        case Client::PublicServerMessage:
         {
             QString message;
             data >> message;
-            AddToLog("[Server]: "+message);
+            Read("[Server]: "+message);
             break;
         }
 
         //смс для всех
-        case MyClient::comMessageToAll:
+        case Client::MessageToAll:
         {
             QString user;
             data >> user;
             QString message;
             data >> message;
-            AddToLog("["+user+"]: "+message);
+            Read("["+user+"]: "+message);
             break;
         }
 
         // приватное смс от пользователя
-        case MyClient::comMessageToUsers:
+        case Client::MessageToUsers:
         {
             QString user;
             data >> user;
             QString message;
             data >> message;
-            AddToLog("["+user+"](private): "+message);
+            Read("["+user+"](private): "+message);
              break;
         }
 
         // приватное смс от сервера
-        case MyClient::comPrivateServerMessage:
+        case Client::PrivateServerMessage:
         {
             QString message;
             data >> message;
-            AddToLog("[Server(private)]: "+message);
+            Read("[Server(private)]: "+message);
             break;
         }
 
         // когда вошел другой пользователь
-        case MyClient::comUserJoin:
+        case Client::UserOnline:
         {
             QString name;
             data >> name;
             ui->lwUsers->addItem(name);
-            AddToLog(name+" is online");
+            Read(name+" is online");
             break;
         }
 
 //когда другой пользователь ушел
-        case MyClient::comUserLeft:
+        case Client::UserOffline:
         {
             QString name;
             data >> name;
@@ -142,13 +137,13 @@ void Dialog::onSokReadyRead()
                 if (ui->lwUsers->item(i)->text() == name)
                 {
                     ui->lwUsers->takeItem(i);
-                    AddToLog(name+" is offline");
+                    Read(name+" is offline");
                     break;
                 }
            break;
         }
         // неправильный ник
-        case MyClient::comErrNameInvalid:
+        case Client::ErrNameInvalid:
         {
             QMessageBox::information(this, "Ошибка", "неправильный ник");
             sok->disconnectFromHost();
@@ -156,7 +151,7 @@ void Dialog::onSokReadyRead()
         }
 
         //если ник уже используется
-        case MyClient::comErrNameUsed:
+        case Client::ErrNameUsed:
         {
             QMessageBox::information(this, "Ошибка", "ник уже используется");
             sok->disconnectFromHost();
@@ -166,18 +161,18 @@ void Dialog::onSokReadyRead()
     }
 }
 // подключение
-void Dialog::onSokConnected()
+void Dialog::SokConnected()
 {
     ui->pbConnect->setEnabled(false);
     ui->pbDisconnect->setEnabled(true);
     blockSize = 0;
-    AddToLog("Connected to server"+sok->peerAddress().toString());
+    Read("Connected to server"+sok->peerAddress().toString());
 
     //try autch
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out << (quint16)0;
-    out << (quint8)MyClient::comAutchReq;
+    out << (quint8)Client::AutchReq;
     out << ui->leName->text();
     name = ui->leName->text();
     out.device()->seek(0);
@@ -185,18 +180,19 @@ void Dialog::onSokConnected()
     sok->write(block);
 }
 // отключение
-void Dialog::onSokDisconnected()
+void Dialog::SokDisconnected()
 {
     ui->pbConnect->setEnabled(true);
     ui->pbDisconnect->setEnabled(false);
     ui->pbSend->setEnabled(false);
     ui->lwUsers->clear();
-    AddToLog("Disconnected from server"+sok->peerAddress().toString());
+    Read("Disconnected from server"+sok->peerAddress().toString());
 }
 //сигнал на подключение к серверу
 void Dialog::on_pbConnect_clicked()
 {
     sok->connectToHost(ui->leHost->text(), ui->sbPort->value());
+	// дописать
 }
 //сигнал на отключение
 void Dialog::on_pbDisconnect_clicked()
@@ -204,39 +200,31 @@ void Dialog::on_pbDisconnect_clicked()
     sok->disconnectFromHost();
 }
 
-//void Dialog::on_cbToAll_clicked()
-//{
-//    if (ui->cbToAll->isChecked())
-//        ui->pbSend->setText("For all");
-//    else
-//        ui->pbSend->setText("Send To Selected");
-//}
+
 // отправка смс
 void Dialog::on_pbSend_clicked()
 {
-//    QByteArray data;
-//    QDataStream out(&data, QIODevice::WriteOnly);
-//  out << (quint16)0;
-//    if (ui->cbToAll->isChecked())
-//        out << (quint8)MyClient::comMessageToAll;
-//    else
-//    {
-//        out << (quint8)MyClient::comMessageToUsers;
-//        QString s;
-//        foreach (QListWidgetItem *i, ui->lwUsers->selectedItems())
-//            s += i->text()+",";
-//        s.remove(s.length()-1, 1);
-//        out << s;
-//    }
+    QByteArray data;
+    QDataStream out(&data, QIODevice::WriteOnly);
+  out << (quint16)0;
+    if (ui->cbToAll->isChecked())
+       out << (quint8)Client::MessageToAll;
+    else
+    {
+        out << (quint8)Client::MessageToUsers;
+        QString s;
+        foreach (QListWidgetItem *i, ui->lwUsers->selectedItems())
+           s += i->text()+";";
+       
+        out << s;
+    }
 
-//    out << ui->pteMessage->document()->toPlainText();
-//    out.device()->seek(0);
-//    out << (quint16)(data.size() - sizeof(quint16));
-//    sok->write(data);
-//    ui->pteMessage->clear();
+    out << ui->pteMessage->document()->toPlainText();
+//   дописать
+   ui->pteMessage->clear();
 }
-
-void Dialog::AddToLog(QString text)
+// вывод на экран
+void Dialog::Read(QString text)
 {
     ui->lwLog->insertItem(0, QTime::currentTime().toString()+" "+text);
 
