@@ -9,11 +9,9 @@ bool MyServer::StartServer(QHostAddress addr, qint16 port)
 {
     if (!listen(addr, port))
     {
-     //   qDebug() << "Server not started at" << addr << ":" << port;
-        return false;
+            return false;
     }
-  // qDebug() << "Server started at" << addr << ":" << port;
-    return true;
+     return true;
 }
 //уведомление о новом пользователе
 void MyServer::SendToAllUserOnline(QString name)
