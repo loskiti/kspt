@@ -41,7 +41,6 @@ public slots:
 private slots:
     // сообщения сервера
     void on_pbSend_clicked();
-    //void on_cbToAll_clicked();
     //включение/выключение сервера
     void on_pbStartStop_clicked(bool checked);
 };
