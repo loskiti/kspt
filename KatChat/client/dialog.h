@@ -38,7 +38,6 @@ private:
     Ui::Dialog *ui;
     QTcpSocket *sok;
     quint16 blockSize;
-    //имя пользователя
     QString name;
     // функция вывода текста
     void Write(QString text);
