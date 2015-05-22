@@ -1,24 +1,19 @@
 #include "myclient.h"
 
-//const QString MyClient::constNameUnknown = QString(".Unknown");
-// ????????
+
 MyClient::MyClient(int desc, MyServer *serv1, QObject *parent) :QObject(parent)
 {
 
     serv = serv1;
     Authorization = false;
-   // name = /*constNameUnknown*/QString(".Unknown");
     blockSize = 0;
     sok = new QTcpSocket(this);
-    //????????? ????? ? ??????
     sok->setSocketDescriptor(desc);
-    //?????????? ???????
     connect(sok, SIGNAL(connected()), this, SLOT(Connect()));
     connect(sok, SIGNAL(disconnected()), this, SLOT(Disconnect()));
     connect(sok, SIGNAL(readyRead()), this, SLOT(Options()));
     connect(sok, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(Error(QAbstractSocket::SocketError)));
 
-   // qDebug() << "Client connected" << desc;
 }
 
 MyClient::~MyClient()
@@ -33,10 +28,8 @@ void MyClient::Connect()
 // выход из клиента
 void MyClient::Disconnect()
 {
-   // qDebug() << "Client disconnected";
     if (Authorization==true)
     {
-
         emit DisconnectUser(name);
         serv->SendToAllUserOffline(name);
         emit DisconUser(this);
@@ -53,14 +46,14 @@ void MyClient::Error(QAbstractSocket::SocketError socketError)
         break;
        // Адрес узла не найден
     case QAbstractSocket::HostNotFoundError:
-        QMessageBox::information(&window, "??????", "// Адрес узла не найден");
+        QMessageBox::information(&window, "Ошибка", "// Адрес узла не найден");
         break;
         //Соединение было разорвано другим узлом (или по тайм-ауту)
     case QAbstractSocket::ConnectionRefusedError:
-        QMessageBox::information(&window, "??????", "?????????? ???? ????????? ?????? ????? (??? ?? ????-????).");
+        QMessageBox::information(&window, "Ошибка", "Соединение было разорвано другим узлом (или по тайм-ауту)");
         break;
     default:
-        QMessageBox::information(&window, "??????", "????????? ??????: "+sok->errorString());
+        QMessageBox::information(&window, "Ошибка", "Произошла ошибка: " +sok->errorString());
     }
 
 }
@@ -73,20 +66,17 @@ void MyClient::Options()
 
         if (sok->bytesAvailable() < (int)sizeof(quint16))
             return;
-
         data >> blockSize;
-       // qDebug() << "_blockSize now " << _blockSize;
+       
     }
 
     if (sok->bytesAvailable() < blockSize)
         return;
     else
-
         blockSize = 0;
 
     quint8 command;
     data >> command;
-   // qDebug() << "Received command " << command;
     //все команды кроме запроса авторизации от неавторизованного пользователя игнорируются
     if (Authorization==false && command != Registration)
         return;
@@ -99,7 +89,7 @@ void MyClient::Options()
 
             QString  user;
             data >> user;
- // неправильный ник
+            // неправильный ник
             if (serv->isNameValid(user)==false)
             {
                 SendCommand(ErrNameInvalid);
@@ -158,8 +148,7 @@ void MyClient::SendCommand(quint8 com)
     out.device()->seek(0);
     out << (quint16)(block.size() - sizeof(quint16));
     sok->write(block);
-   // qDebug() << "Send to" << name << "command:" << comm;
-}
+ }
 // отправить положительный ответ на авторизацию и список клиентов, которые онлайн
 void MyClient::SendUserIsOnline()
 {
@@ -177,7 +166,6 @@ void MyClient::SendUserIsOnline()
     out.device()->seek(0);
     out << (quint16)(block.size() - sizeof(quint16));
     sok->write(block);
-   // qDebug() << "Send user list to" << name << ":" << s;
 }
 
 
