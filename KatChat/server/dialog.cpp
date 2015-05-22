@@ -7,18 +7,12 @@ Dialog::Dialog(QWidget *parent) :QDialog(parent), ui(new Ui::Dialog)
     serv = new MyServer(this, this);
     connect(this, SIGNAL(messageText(QString,QStringList)), serv, SLOT(MessageText(QString,QStringList)));
     connect(serv, SIGNAL(Writechat(QString)), this, SLOT(WriteChat(QString)));
-
     //по умолчанию  127.0.0.1:1234
     if (serv->StartServer(QHostAddress::LocalHost, 1234)==true)
     {
         ui->lwChat->insertItem(0, QTime::currentTime().toString()+" server strated at "+serv->serverAddress().toString()+":"+QString::number(serv->serverPort()));
 
     }
-//    else
-//    {
-//        ui->lwChat->insertItem(0, QTime::currentTime().toString()+" server not strated at "+serv->serverAddress().toString()+":"+QString::number(serv->serverPort()));
-//        ui->pbStartStop->setChecked(true);
-//    }
 }
 
 Dialog::~Dialog()
@@ -79,15 +73,6 @@ void Dialog::on_pbSend_clicked()
         Write("[Server]("+flag.join(";")+"): "+ui->pteMessage->document()->toPlainText());
     ui->pteMessage->clear();
 }
-
-//void Dialog::on_cbToAll_clicked()
-//{
-//    if (ui->cbToAll->isChecked())
-//        ui->pbSend->setText("Send To All");
-//    else
-//        ui->pbSend->setText("Send To Selected");
-//}
-
 //включение/выключение сервера
 void Dialog::on_pbStartStop_clicked(bool checked)
 {
@@ -110,11 +95,6 @@ void Dialog::on_pbStartStop_clicked(bool checked)
             Write(" server strated at "+ui->leHost->text()+":"+ui->lePort->text());
             ui->pbStartStop->setText("Stop server");
         }
-//        else
-//        {
-//            Write(" server not strated at "+ui->leHost->text()+":"+ui->lePort->text());
-//            ui->pbStartStop->setChecked(true);
-//        }
     }
 }
 // вывод в чат
