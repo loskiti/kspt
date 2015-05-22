@@ -2,15 +2,12 @@
 #include "ui_dialog.h"
 #include <QtGui>
 #include <QDebug>
-//подкласс
+
 
 Dialog::Dialog(QWidget *parent) :QDialog(parent),ui(new Ui::Dialog)
 {
     ui->setupUi(this);
-// новый сокет
     sok = new QTcpSocket(this);
-    //подключаем сигналы
-
     connect(sok, SIGNAL(connected()), this, SLOT(Connected()));
     connect(sok, SIGNAL(disconnected()), this, SLOT(Disconnected()));
     connect(sok, SIGNAL(readyRead()), this, SLOT(Operation()));
@@ -45,21 +42,20 @@ void Dialog::Operation()
 {// в каждом блоке первые 2 байта - размер, 3 байт - команда, дальше информация
     QDataStream data(sok);
 
-    if (blockSize == 0) {
-
-        if (sok->bytesAvailable() < (int)sizeof(quint16))
-            return;
-        data >> blockSize;
-          }
+    if (blockSize == 0) 
+    {
+      if (sok->bytesAvailable() < (int)sizeof(quint16))
+        return;
+      data >> blockSize;
+    }
 
     if (sok->bytesAvailable() < blockSize)
         return;
     else
         blockSize = 0;
 
-        quint8 command;
+    quint8 command;
     data >> command;
-
 
     switch (command)
     {
@@ -127,7 +123,7 @@ void Dialog::Operation()
             break;
         }
 
-//когда другой пользователь ушел
+        //когда другой пользователь ушел
         case MyClient::UserOffline:
         {
             QString user;
@@ -166,7 +162,6 @@ void Dialog::Connected()
     ui->pbDisconnect->setEnabled(true);
     blockSize = 0;
     Write("Connected to server"+sok->peerAddress().toString());
-
     //запрос на авторизацию
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
