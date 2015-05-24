@@ -11,10 +11,7 @@ TelBook::TelBook(const vector<vector <string>>& book2)
 	//setBook(book2);
 	book=book2;
 }
-//void TelBook::setBook (const vector <vector<string>>& book2)
-//{
-//	book=book2;		
-//	}
+
 
 bool TelBook::delit(string delname)// удаление абонента со всеми номерами
 {
